@@ -48,16 +48,16 @@ export interface RoundInfo {
   status: RoundStatus;
 }
 
-export interface Verdict {
+export interface VerdictResponse {
   winner: VerdictType;
   confidence: number;
   explanation: string;
-  proSummary: string;
-  conSummary: string;
-  consensusConclusion: string;
-  evidenceSummary: string;
-  proTotalScore: number;
-  conTotalScore: number;
+  pro_summary: string;
+  con_summary: string;
+  consensus_conclusion: string;
+  evidence_summary: string;
+  pro_total_score: number;
+  con_total_score: number;
 }
 
 export interface DebateState {
@@ -70,7 +70,7 @@ export interface DebateState {
   arguments: Argument[];
   evidence: EvidenceItem[];
   humanInputs: HumanInput[];
-  verdict: Verdict | null;
+  verdict: VerdictResponse | null;
   isLoading: boolean;
   error: string | null;
 }

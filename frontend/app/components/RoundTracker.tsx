@@ -41,8 +41,8 @@ export default function RoundTracker({ rounds, currentRound }: RoundTrackerProps
                 className={clsx(
                   'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all',
                   isComplete && 'border-green-500 bg-green-500/20 text-green-400',
-                  isActive && 'border-blue-400 bg-blue-500/20 text-blue-400',
-                  isPending && 'border-[var(--text-muted)] bg-transparent text-[var(--text-muted)]',
+                  isActive && 'border-pro-primary bg-pro-primary/20 text-pro-primary',
+                  isPending && 'border-text-muted bg-transparent text-text-muted',
                 )}
                 animate={isActive ? { scale: [1, 1.08, 1] } : {}}
                 transition={{ duration: 1.5, repeat: Infinity }}
@@ -52,9 +52,9 @@ export default function RoundTracker({ rounds, currentRound }: RoundTrackerProps
               <div className="text-center">
                 <div className={clsx(
                   'text-xs font-semibold whitespace-nowrap',
-                  isActive && 'text-blue-400',
+                  isActive && 'text-pro-primary',
                   isComplete && 'text-green-400',
-                  isPending && 'text-[var(--text-muted)]',
+                  isPending && 'text-text-muted',
                 )}>
                   {round.label}
                 </div>
@@ -89,7 +89,7 @@ export default function RoundTracker({ rounds, currentRound }: RoundTrackerProps
           </div>
           <div className={clsx(
             'text-xs font-semibold',
-            currentRound > 3 ? 'text-amber-400' : 'text-[var(--text-muted)]'
+            currentRound > 3 ? 'text-judge-primary' : 'text-text-muted'
           )}>
             Verdict
           </div>

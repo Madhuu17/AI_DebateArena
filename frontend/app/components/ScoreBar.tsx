@@ -18,7 +18,7 @@ export default function ScoreBar({ score, showLabel = true, size = 'md', agentCo
   };
 
   const heightClass = size === 'sm' ? 'h-1.5' : size === 'lg' ? 'h-3' : 'h-2';
-  const color = agentColor === 'blue' ? '#3b82f6' : agentColor === 'red' ? '#ef4444' : agentColor === 'amber' ? '#f59e0b' : getScoreColor(score);
+  const color = agentColor === 'blue' ? '#3b82f6' : agentColor === 'red' ? '#f43f5e' : agentColor === 'amber' ? '#f59e0b' : getScoreColor(score);
 
   return (
     <div className="w-full">

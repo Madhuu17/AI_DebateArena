@@ -27,23 +27,24 @@ export function createDebateStream(sessionId: string): EventSource {
   return new EventSource(`${API_URL}/debate/${sessionId}/stream`);
 }
 
-export async function submitEvidenceUrl(
+export async function verifyEvidence(
   sessionId: string,
-  url: string
-): Promise<{ status: string; explanation: string; sources?: string[] }> {
+  type: 'url' | 'text',
+  content: string
+): Promise<any> {
   const res = await fetch(`${API_URL}/evidence/submit`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ session_id: sessionId, type: 'url', content: url }),
+    body: JSON.stringify({ session_id: sessionId, type, content }),
   });
   if (!res.ok) throw new Error('Failed to submit evidence');
   return res.json();
 }
 
-export async function submitEvidenceFile(
-  sessionId: string,
-  file: File
-): Promise<{ status: string; explanation: string }> {
+export async function verifyFileEvidence(
+  file: File,
+  sessionId: string
+): Promise<any> {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('session_id', sessionId);

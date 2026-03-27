@@ -8,7 +8,7 @@ export default function Home() {
   const { state, handleStart, handleHumanSubmit, handleEvidenceAdd, handleReset } = useDebate();
 
   if (state.status === 'idle') {
-    return <TopicInput onStart={handleStart} isLoading={state.isLoading} />;
+    return <TopicInput onSubmit={handleStart} />;
   }
 
   return (

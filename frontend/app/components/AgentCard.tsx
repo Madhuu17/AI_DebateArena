@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { AgentType, AGENT_PERSONAS } from '../types';
+import { Trophy, Activity, Zap, Shield } from 'lucide-react';
 
 interface AgentCardProps {
   agent: AgentType;
@@ -10,110 +11,119 @@ interface AgentCardProps {
   roundsComplete: number;
 }
 
-const AGENT_STYLE: Record<AgentType, {
-  bg: string; border: string; glow: string; nameColor: string;
+const AGENT_THEMES: Record<AgentType, { 
+  primary: string; glow: string; icon: any; shadow: string;
 }> = {
-  pro: {
-    bg: 'rgba(59,130,246,0.08)',
-    border: 'var(--pro-border)',
-    glow: '0 0 40px rgba(59,130,246,0.25)',
-    nameColor: 'var(--pro-primary)',
+  pro: { 
+    primary: '#3b82f6', 
+    glow: 'rgba(59, 130, 246, 0.4)', 
+    icon: <Zap className="w-4 h-4" />, 
+    shadow: 'shadow-[0_0_40px_-5px_rgba(59, 130, 246, 0.2)]'
   },
-  con: {
-    bg: 'rgba(239,68,68,0.08)',
-    border: 'var(--con-border)',
-    glow: '0 0 40px rgba(239,68,68,0.25)',
-    nameColor: 'var(--con-primary)',
+  con: { 
+    primary: '#f43f5e', 
+    glow: 'rgba(244, 63, 94, 0.4)', 
+    icon: <Shield className="w-4 h-4" />, 
+    shadow: 'shadow-[0_0_40px_-5px_rgba(244, 63, 94, 0.2)]'
   },
-  judge: {
-    bg: 'rgba(245,158,11,0.08)',
-    border: 'var(--judge-border)',
-    glow: '0 0 40px rgba(245,158,11,0.25)',
-    nameColor: 'var(--judge-primary)',
+  judge: { 
+    primary: '#f59e0b', 
+    glow: 'rgba(245, 158, 11, 0.4)', 
+    icon: <Activity className="w-4 h-4" />, 
+    shadow: 'shadow-[0_0_40px_-5px_rgba(245, 158, 11, 0.2)]'
   },
-  human: {
-    bg: 'rgba(168,85,247,0.08)',
-    border: 'rgba(168,85,247,0.4)',
-    glow: '0 0 40px rgba(168,85,247,0.25)',
-    nameColor: '#a855f7',
+  human: { 
+    primary: '#a855f7', 
+    glow: 'rgba(168, 85, 247, 0.4)', 
+    icon: <Trophy className="w-4 h-4" />, 
+    shadow: 'shadow-[0_0_40px_-5px_rgba(168, 85, 247, 0.2)]'
   },
 };
 
 export default function AgentCard({ agent, totalScore, isActive, roundsComplete }: AgentCardProps) {
   const persona = AGENT_PERSONAS[agent];
-  const style = AGENT_STYLE[agent];
+  const theme = AGENT_THEMES[agent];
 
   return (
     <motion.div
-      className="rounded-2xl p-6 relative overflow-hidden"
-      style={{
-        background: style.bg,
-        border: `1px solid ${style.border}`,
-        boxShadow: isActive ? style.glow : 'none',
+      initial={{ opacity: 0, x: agent === 'pro' ? -20 : 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      className={`relative glass-card overflow-hidden group ${isActive ? theme.shadow : ''}`}
+      style={{ 
+        border: isActive ? `1px solid ${theme.primary}50` : '1px solid rgba(255,255,255,0.05)',
+        background: isActive ? `${theme.primary}05` : 'rgba(255,255,255,0.02)'
       }}
-      animate={isActive ? { boxShadow: [style.glow, '0 0 20px transparent', style.glow] } : {}}
-      transition={{ duration: 2, repeat: Infinity }}
     >
-      {/* Active pulse ring */}
-      {isActive && (
-        <motion.div
-          className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full"
-          style={{ backgroundColor: style.nameColor }}
-          animate={{ opacity: [1, 0.3, 1], scale: [1, 1.3, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        />
-      )}
+      {/* Top Accent Bar */}
+      <div 
+        className="absolute top-0 left-0 w-full h-1 transition-all duration-500"
+        style={{ 
+          background: isActive ? `linear-gradient(90deg, transparent, ${theme.primary}, transparent)` : 'transparent',
+          opacity: isActive ? 1 : 0
+        }}
+      />
 
-      <div className="flex items-start gap-3">
-        {/* Avatar */}
-        <motion.div
-          className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-          style={{ background: `${style.nameColor}20`, border: `1px solid ${style.border}` }}
-          animate={isActive ? { rotate: [0, -3, 3, 0] } : {}}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          {persona.icon}
-        </motion.div>
+      <div className="relative z-10 space-y-6">
+        {/* Header: Icon + Name */}
+        <div className="flex items-center gap-4">
+           <motion.div 
+             animate={isActive ? { scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] } : {}}
+             transition={{ duration: 4, repeat: Infinity }}
+             className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-2xl relative"
+             style={{ background: `${theme.primary}20`, border: `1px solid ${theme.primary}40` }}
+           >
+              {persona.icon}
+              {isActive && (
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: theme.primary }} />
+                  <span className="relative inline-flex rounded-full h-3 w-3" style={{ background: theme.primary }} />
+                </span>
+              )}
+           </motion.div>
+           
+           <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: theme.primary }}>
+                    {agent.toUpperCase()}
+                 </span>
+                 {theme.icon}
+              </div>
+              <h3 className="text-xl font-black text-white leading-none mt-0.5">{persona.name}</h3>
+           </div>
+        </div>
 
-        <div className="flex-1 min-w-0">
-          {/* Role label */}
-          <div className="text-xs text-[var(--text-muted)] uppercase tracking-widest mb-0.5 font-medium">
-            {agent === 'pro' ? 'PRO SIDE' : agent === 'con' ? 'CON SIDE' : agent === 'judge' ? 'ARBITER' : 'OBSERVER'}
-          </div>
-          {/* Name */}
-          <h3 className="text-lg font-bold leading-tight" style={{ color: style.nameColor }}>
-            {persona.name}
-          </h3>
-          {/* Style tag */}
-          <span
-            className="inline-block text-xs px-2 py-0.5 rounded-full mt-1 font-medium"
-            style={{ background: `${style.nameColor}20`, color: style.nameColor }}
-          >
-            {persona.style}
-          </span>
+        {/* Persona Style Tag */}
+        <div className="px-3 py-1.5 rounded-xl border border-white/5 bg-white/5 inline-block">
+           <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest leading-none">
+             Personality: <span className="text-text-main">{persona.style}</span>
+           </span>
+        </div>
+
+        {/* Performance Metrics */}
+        <div className="grid grid-cols-2 gap-3 pt-4 border-t border-white/5">
+           <div className="flex flex-col">
+              <span className="text-[9px] font-bold text-text-muted uppercase tracking-widest mb-1">Impact</span>
+              <div className="flex items-end gap-1">
+                 <span className="text-2xl font-black mono text-white leading-none">
+                   {totalScore > 0 ? totalScore : '--'}
+                 </span>
+                 <span className="text-[10px] font-bold text-text-muted mb-1">PTS</span>
+              </div>
+           </div>
+           <div className="flex flex-col">
+              <span className="text-[9px] font-bold text-text-muted uppercase tracking-widest mb-1">Round Activity</span>
+              <div className="flex items-end gap-1">
+                 <span className="text-2xl font-black mono text-white leading-none">{roundsComplete}</span>
+                 <span className="text-[10px] font-bold text-text-muted mb-1">/ 3</span>
+              </div>
+           </div>
         </div>
       </div>
 
-      {/* Stats row */}
-      {agent !== 'human' && (
-        <div className="mt-4 flex items-center justify-between pt-3 border-t border-[rgba(255,255,255,0.06)]">
-          <div className="text-center">
-            <div className="mono text-lg font-bold" style={{ color: style.nameColor }}>
-              {totalScore > 0 ? Math.round(totalScore) : '—'}
-            </div>
-            <div className="text-xs text-[var(--text-muted)]">Avg Score</div>
-          </div>
-          <div className="text-center">
-            <div className="mono text-lg font-bold text-[var(--text-primary)]">{roundsComplete}</div>
-            <div className="text-xs text-[var(--text-muted)]">Rounds</div>
-          </div>
-          <div className="text-center">
-            <div className={`text-xs font-semibold px-2 py-1 rounded-full ${isActive ? 'bg-green-500/20 text-green-400' : 'bg-[rgba(255,255,255,0.04)] text-[var(--text-muted)]'}`}>
-              {isActive ? '● LIVE' : 'IDLE'}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Background Graphic */}
+      <div className="absolute -bottom-6 -right-6 opacity-5 rotate-12 group-hover:rotate-0 transition-transform duration-700">
+         <div className="text-8xl font-black select-none pointer-events-none">{persona.icon}</div>
+      </div>
     </motion.div>
   );
 }

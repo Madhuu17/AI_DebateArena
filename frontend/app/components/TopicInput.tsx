@@ -1,183 +1,146 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { Sparkles, ChevronRight, Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, ArrowRight, Shield, Swords, Scale } from 'lucide-react';
 
-interface TopicInputProps {
-  onStart: (topic: string) => void;
-  isLoading: boolean;
-}
-
-const EXAMPLE_TOPICS = [
-  'AI will replace doctors within 10 years',
-  'Social media does more harm than good',
-  'Remote work is better than office work',
-  'Nuclear energy is the future of clean power',
-  'Cryptocurrencies should replace fiat currencies',
+const EXAMPLES = [
+  "Universal Basic Income is necessary in the age of AI",
+  "Genetic engineering in humans should be banned",
+  "Social media does more harm than good to democracy",
+  "Space exploration is a waste of resources",
+  "Nuclear energy is the only solution to climate change"
 ];
 
-export default function TopicInput({ onStart, isLoading }: TopicInputProps) {
+interface TopicInputProps {
+  onSubmit: (topic: string) => void;
+}
+
+export default function TopicInput({ onSubmit }: TopicInputProps) {
   const [topic, setTopic] = useState('');
   const [exampleIndex, setExampleIndex] = useState(0);
 
-  const handleSubmit = useCallback(() => {
-    if (topic.trim()) onStart(topic.trim());
-  }, [topic, onStart]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setExampleIndex((prev) => (prev + 1) % EXAMPLES.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit();
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (topic.trim().length >= 5) {
+      onSubmit(topic.trim());
     }
   };
 
-  const useExample = () => {
-    setTopic(EXAMPLE_TOPICS[exampleIndex % EXAMPLE_TOPICS.length]);
-    setExampleIndex(i => i + 1);
-  };
-
   return (
-    <div className="min-h-screen bg-grid flex flex-col items-center justify-center px-4 relative overflow-hidden">
-      {/* Ambient orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-10 pointer-events-none"
-        style={{ background: 'radial-gradient(circle, #3b82f6, transparent)' }} />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-10 pointer-events-none"
-        style={{ background: 'radial-gradient(circle, #ef4444, transparent)' }} />
-
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
-        className="w-full max-w-2xl text-center"
-      >
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden mesh-bg p-8">
+      {/* 🎭 THEATRICAL AMBIANCE */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-pro-primary/10 blur-[120px] rounded-full animate-pulse" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-con-primary/10 blur-[120px] rounded-full animate-pulse" />
+      
+      <div className="relative z-10 max-w-5xl w-full flex flex-col items-center">
+        
         {/* Badge */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-8 uppercase tracking-widest"
-          style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.4)', color: '#f59e0b' }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="px-6 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-10 flex items-center gap-3 shadow-2xl"
         >
-          <Zap size={12} /> Multi-Agent AI Debate System
+          <div className="flex -space-x-2">
+            <div className="w-6 h-6 rounded-full bg-pro-primary border-2 border-slate-950 flex items-center justify-center text-[10px]">P</div>
+            <div className="w-6 h-6 rounded-full bg-con-primary border-2 border-slate-950 flex items-center justify-center text-[10px]">C</div>
+            <div className="w-6 h-6 rounded-full bg-judge-primary border-2 border-slate-950 flex items-center justify-center text-[10px]">J</div>
+          </div>
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] overflow-hidden whitespace-nowrap text-text-muted">
+            The Future of <span className="text-white">Structured Debate</span>
+          </span>
         </motion.div>
 
-        {/* Title */}
-        <motion.h1
-          initial={{ opacity: 0, y: 15 }}
+        {/* Hero Headline */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-16"
+        >
+          <h1 className="text-7xl md:text-9xl font-black italic tracking-tighter uppercase leading-[0.8] mb-6">
+            <span className="text-white">AI</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-pro-primary via-accent-purple to-con-primary">ARENA</span>
+          </h1>
+          <p className="max-w-xl mx-auto text-lg md:text-xl text-text-muted font-medium leading-relaxed">
+            Witness an autonomous intellectual battleground where titan intelligences collide.
+          </p>
+        </motion.div>
+
+        {/* 🚀 THE INPUT CORE */}
+        <motion.form
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-6xl font-black mb-4 leading-none tracking-tight"
+          onSubmit={handleSubmit}
+          className="w-full relative group"
         >
-          <span className="text-pro">AI</span>{' '}
-          <span className="text-[var(--text-primary)]">Debate</span>{' '}
-          <span className="text-con">Arena</span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="text-[var(--text-secondary)] text-lg mb-10 max-w-lg mx-auto leading-relaxed"
-        >
-          Watch intelligent AI agents debate any topic across 3 structured rounds. 
-          Provide evidence. Let the Judge decide.
-        </motion.p>
-
-        {/* Agent badges */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="flex items-center justify-center gap-3 mb-10"
-        >
-          {[
-            { icon: '⚡', label: 'Pro Agent', color: '#3b82f6' },
-            { icon: 'vs', label: '', color: '#484f58' },
-            { icon: '🔥', label: 'Con Agent', color: '#ef4444' },
-            { icon: '→', label: '', color: '#484f58' },
-            { icon: '⚖️', label: 'AI Judge', color: '#f59e0b' },
-          ].map((item, i) => (
-            item.label ? (
-              <div key={i} className="flex flex-col items-center gap-1">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold"
-                  style={{ background: `${item.color}20`, border: `1px solid ${item.color}40`, color: item.color }}
-                >
-                  {item.icon}
-                </div>
-                <span className="text-xs text-[var(--text-muted)]">{item.label}</span>
-              </div>
-            ) : (
-              <span key={i} className="text-[var(--text-muted)] font-bold">{item.icon}</span>
-            )
-          ))}
-        </motion.div>
-
-        {/* Input */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="relative"
-        >
-          <div
-            className="relative rounded-2xl overflow-hidden"
-            style={{ border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(15,22,35,0.8)' }}
-          >
+          <div className="absolute -inset-1 bg-gradient-to-r from-pro-primary to-con-primary rounded-[3rem] blur opacity-10 group-focus-within:opacity-30 transition duration-1000 group-focus-within:duration-200" />
+          
+          <div className="relative flex items-center p-2 bg-slate-950/80 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden">
+            <div className="pl-6 text-2xl">⚔️</div>
             <input
+              autoFocus
               type="text"
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Enter a debate topic..."
-              className="w-full bg-transparent px-6 py-5 pr-36 text-base text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none"
-              disabled={isLoading}
+              placeholder="Summon a topic for debate..."
+              className="flex-1 bg-transparent px-6 py-8 text-xl md:text-2xl text-white placeholder:text-text-muted focus:outline-none focus:ring-0"
             />
             <button
-              onClick={handleSubmit}
-              disabled={!topic.trim() || isLoading}
-              className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', color: 'white' }}
+              type="submit"
+              disabled={topic.trim().length < 5}
+              className="mr-2 h-16 px-10 rounded-[1.8rem] bg-white text-black font-black uppercase tracking-[0.2em] flex items-center gap-3 hover:bg-pro-primary hover:text-white transition-all disabled:opacity-20 disabled:grayscale"
             >
-              {isLoading ? (
-                <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
-                  <Sparkles size={16} />
-                </motion.div>
-              ) : (
-                <>Start <ChevronRight size={14} /></>
-              )}
+              INITIALIZE <ArrowRight className="w-5 h-5" />
             </button>
           </div>
+        </motion.form>
 
-          {/* Example button */}
-          <button
-            onClick={useExample}
-            className="mt-3 text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors underline underline-offset-2"
-            disabled={isLoading}
-          >
-            ✨ Try an example topic
-          </button>
-        </motion.div>
+        {/* Examples Ticker */}
+        <div className="mt-12 flex flex-col items-center gap-4">
+           <div className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.3em] text-text-muted opacity-50">
+              <Sparkles size={14} className="text-pro-primary" /> 
+              Instant Prompts
+           </div>
+           <div className="h-10 overflow-hidden relative w-full flex justify-center">
+             <AnimatePresence mode="wait">
+               <motion.button
+                 key={exampleIndex}
+                 initial={{ opacity: 0, y: 10 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 exit={{ opacity: 0, y: -10 }}
+                 onClick={() => setTopic(EXAMPLES[exampleIndex])}
+                 className="text-sm md:text-base font-bold text-text-muted hover:text-pro-primary transition-colors cursor-pointer text-center italic"
+               >
+                 "{EXAMPLES[exampleIndex]}"
+               </motion.button>
+             </AnimatePresence>
+           </div>
+        </div>
 
-        {/* Features */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          className="flex items-center justify-center gap-6 mt-10 flex-wrap"
-        >
-          {[
-            '🔄 3 Debate Rounds',
-            '🎯 Fallacy Detection',
-            '✅ Live Fact-Checking',
-            '📊 Argument Scoring',
-            '👤 Human Intervention',
-          ].map((feat) => (
-            <span key={feat} className="text-xs text-[var(--text-muted)]">{feat}</span>
-          ))}
-        </motion.div>
-      </motion.div>
+        {/* Feature Icons */}
+        <div className="mt-24 grid grid-cols-3 gap-12 border-t border-white/5 pt-12">
+           <Feature icon={<Swords className="text-pro-primary" />} label="Multi-Agent" />
+           <Feature icon={<Shield className="text-con-primary" />} label="Fact Verified" />
+           <Feature icon={<Scale className="text-judge-primary" />} label="Explainable" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Feature({ icon, label }: { icon: any; label: string }) {
+  return (
+    <div className="flex flex-col items-center gap-3 opacity-40 hover:opacity-100 transition-opacity">
+       <div className="p-4 rounded-2xl bg-white/5 border border-white/10">{icon}</div>
+       <span className="text-[10px] font-black uppercase tracking-[0.3em]">{label}</span>
     </div>
   );
 }
