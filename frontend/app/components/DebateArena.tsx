@@ -39,8 +39,8 @@ export default function DebateArena({ state, onHumanSubmit, onEvidenceAdd, onRes
   const conArgs = state.arguments.filter(a => a.agent === 'con');
   const judgeArgs = state.arguments.filter(a => a.agent === 'judge');
 
-  const proAvgScore = proArgs.length ? Math.round(proArgs.reduce((s, a) => s + a.score, 0) / proArgs.length) : 0;
-  const conAvgScore = conArgs.length ? Math.round(conArgs.reduce((s, a) => s + a.score, 0) / conArgs.length) : 0;
+  const proAvgScore = proArgs.length ? (proArgs.reduce((s, a) => s + a.score, 0) / proArgs.length) : 0;
+  const conAvgScore = conArgs.length ? (conArgs.reduce((s, a) => s + a.score, 0) / conArgs.length) : 0;
 
   // Auto-scroll the feed
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function DebateArena({ state, onHumanSubmit, onEvidenceAdd, onRes
           <div className="flex flex-col items-center">
             <div className="flex items-center gap-10">
                <div className="flex flex-col items-center">
-                  <div className="text-2xl font-black text-pro-primary mono tracking-tighter">{proAvgScore}</div>
+                  <div className="text-2xl font-black text-pro-primary mono tracking-tighter">{proAvgScore.toFixed(1)}</div>
                   <div className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em]">Logic</div>
                </div>
                <div className="h-12 w-px bg-white/10" />
@@ -90,7 +90,7 @@ export default function DebateArena({ state, onHumanSubmit, onEvidenceAdd, onRes
                </div>
                <div className="h-12 w-px bg-white/10" />
                <div className="flex flex-col items-center">
-                  <div className="text-2xl font-black text-con-primary mono tracking-tighter">{conAvgScore}</div>
+                  <div className="text-2xl font-black text-con-primary mono tracking-tighter">{conAvgScore.toFixed(1)}</div>
                   <div className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em]">Ethics</div>
                </div>
             </div>
@@ -139,7 +139,7 @@ export default function DebateArena({ state, onHumanSubmit, onEvidenceAdd, onRes
                <div className="space-y-4">
                   <div className="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/5">
                     <span className="text-xs text-text-muted">Persuasion</span>
-                    <span className="text-xs font-bold text-pro-primary mono">{proAvgScore > 50 ? 'EXCEPTIONAL' : 'AVERAGE'}</span>
+                    <span className="text-xs font-bold text-pro-primary mono">{proAvgScore > 0.5 ? 'EXCEPTIONAL' : 'AVERAGE'}</span>
                   </div>
                   <div className="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/5">
                     <span className="text-xs text-text-muted">Evidence Depth</span>
@@ -253,7 +253,7 @@ export default function DebateArena({ state, onHumanSubmit, onEvidenceAdd, onRes
                <div className="space-y-4">
                   <div className="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/5">
                     <span className="text-xs text-text-muted">Critical Edge</span>
-                    <span className="text-xs font-bold text-con-primary mono">{conAvgScore > 50 ? 'SHARP' : 'STABLE'}</span>
+                    <span className="text-xs font-bold text-con-primary mono">{conAvgScore > 0.5 ? 'SHARP' : 'STABLE'}</span>
                   </div>
                   <div className="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/5">
                     <span className="text-xs text-text-muted">Fallacy Detection</span>

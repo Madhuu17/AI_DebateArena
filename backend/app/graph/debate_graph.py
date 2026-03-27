@@ -59,7 +59,7 @@ async def run_debate_graph(
         "status": "running",
     }
 
-    from app.db.mongo import get_human_inputs
+    from app.db.mongo import get_human_inputs, save_session
 
     for round_num in range(1, 4):
         state["current_round"] = round_num
@@ -83,6 +83,7 @@ async def run_debate_graph(
         async for event in _stream_text_event(pro_dict):
             yield event
         state["arguments"].append(pro_dict)
+        await save_session(state)
         await asyncio.sleep(1.0)
 
         # --- CON NODE (with streaming) ---
@@ -96,6 +97,7 @@ async def run_debate_graph(
         async for event in _stream_text_event(con_dict):
             yield event
         state["arguments"].append(con_dict)
+        await save_session(state)
         await asyncio.sleep(1.0)
 
         # --- JUDGE NODE (with streaming) ---
@@ -109,6 +111,7 @@ async def run_debate_graph(
         async for event in _stream_text_event(judge_dict, delay_per_word=0.05):
             yield event
         state["arguments"].append(judge_dict)
+        await save_session(state)
         await asyncio.sleep(0.8)
 
         yield {"event": "round_change", "data": json.dumps({"round": round_num + 1, "status": "complete"})}
@@ -124,4 +127,6 @@ async def run_debate_graph(
         evidence_summary=state["evidence_summary"]
     )
     state["verdict"] = verdict.model_dump()
+    state["status"] = "completed"
+    await save_session(state)
     yield {"event": "verdict", "data": json.dumps(verdict.model_dump())}

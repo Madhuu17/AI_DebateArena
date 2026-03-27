@@ -47,6 +47,13 @@ async def get_session(session_id: str) -> Optional[dict]:
     return await _db.debates.find_one({"session_id": session_id}, {"_id": 0})
 
 
+async def get_all_sessions(limit: int = 50) -> List[dict]:
+    if DEMO_MODE or _db is None:
+        return list(_in_memory_sessions.values())
+    cursor = _db.debates.find({}, {"_id": 0}).sort("_id", -1).limit(limit)
+    return await cursor.to_list(length=limit)
+
+
 async def queue_human_input(session_id: str, content: str):
     if session_id not in _in_memory_human_inputs:
         _in_memory_human_inputs[session_id] = []

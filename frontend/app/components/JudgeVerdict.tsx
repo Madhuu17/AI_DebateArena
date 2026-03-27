@@ -74,7 +74,7 @@ export default function JudgeVerdict({ verdict }: JudgeVerdictProps) {
               <Zap className="w-4 h-4 text-pro-primary" />
               <span className="text-[10px] font-black uppercase tracking-widest text-white">Pro Advocate</span>
             </div>
-            <span className="text-sm font-black mono" style={{ color: '#3b82f6' }}>{proTotal} pts ({proPercent}%)</span>
+            <span className="text-sm font-black mono" style={{ color: '#3b82f6' }}>{proTotal.toFixed(1)}x pts ({proPercent}%)</span>
           </div>
           <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden">
             <motion.div
@@ -94,7 +94,7 @@ export default function JudgeVerdict({ verdict }: JudgeVerdictProps) {
               <Shield className="w-4 h-4 text-con-primary" />
               <span className="text-[10px] font-black uppercase tracking-widest text-white">Con Challenger</span>
             </div>
-            <span className="text-sm font-black mono" style={{ color: '#f43f5e' }}>{conTotal} pts ({conPercent}%)</span>
+            <span className="text-sm font-black mono" style={{ color: '#f43f5e' }}>{conTotal.toFixed(1)}x pts ({conPercent}%)</span>
           </div>
           <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden">
             <motion.div
@@ -138,6 +138,20 @@ export default function JudgeVerdict({ verdict }: JudgeVerdictProps) {
           <p className="text-sm text-text-muted leading-relaxed">{verdict.con_summary}</p>
         </div>
       </div>
+
+      {/* ===== FINAL DRAFTS ===== */}
+      {(verdict.pro_draft || verdict.con_draft) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="rounded-2xl p-6 border border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-pro-primary mb-3">Pro: Final Draft / Synthesis</h4>
+            <p className="text-sm text-text-muted leading-relaxed italic">{verdict.pro_draft}</p>
+          </div>
+          <div className="rounded-2xl p-6 border border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-con-primary mb-3">Con: Final Draft / Synthesis</h4>
+            <p className="text-sm text-text-muted leading-relaxed italic">{verdict.con_draft}</p>
+          </div>
+        </div>
+      )}
 
       {/* ===== CONSENSUS ===== */}
       <div className="rounded-2xl p-6 border border-accent-purple/20 mb-5" style={{ background: 'rgba(139,92,246,0.04)' }}>

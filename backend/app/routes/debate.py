@@ -5,12 +5,17 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import StreamingResponse
 from app.models.schemas import TopicRequest, StartDebateResponse, HumanInputRequest
 from app.graph.debate_graph import run_debate_graph
-from app.db.mongo import save_session, get_session, queue_human_input
+from app.db.mongo import save_session, get_session, queue_human_input, get_all_sessions
 
 router = APIRouter(prefix="/debate", tags=["debate"])
 
 # Active debate tasks
 _active_streams: dict = {}
+
+@router.get("/history")
+async def get_debate_history(limit: int = 50):
+    sessions = await get_all_sessions(limit)
+    return {"debates": sessions}
 
 
 @router.post("/start", response_model=StartDebateResponse)

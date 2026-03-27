@@ -19,7 +19,7 @@ class ArgumentResponse(BaseModel):
     round: int
     round_type: Literal["opening", "rebuttal", "closing"]
     text: str
-    score: int = Field(ge=0, le=100)
+    score: float = Field(ge=0.0, le=1.0)
     tone: Literal["aggressive", "neutral", "confident", "emotional", "logical"]
     fallacies: List[FallacyTag] = []
     timestamp: datetime = Field(default_factory=datetime.utcnow)
@@ -49,10 +49,12 @@ class VerdictResponse(BaseModel):
     explanation: str
     pro_summary: str
     con_summary: str
+    pro_draft: str = ""
+    con_draft: str = ""
     consensus_conclusion: str
     evidence_summary: str
-    pro_total_score: int
-    con_total_score: int
+    pro_total_score: float
+    con_total_score: float
 
 
 class DebateSession(BaseModel):

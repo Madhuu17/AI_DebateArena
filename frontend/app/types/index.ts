@@ -54,6 +54,8 @@ export interface VerdictResponse {
   explanation: string;
   pro_summary: string;
   con_summary: string;
+  pro_draft: string;
+  con_draft: string;
   consensus_conclusion: string;
   evidence_summary: string;
   pro_total_score: number;

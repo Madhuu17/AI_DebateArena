@@ -29,8 +29,14 @@ async def run_con_agent(topic: str, round_num: int, debate_history: list, human_
     history_str = "\n".join([f"[{a['agent'].upper()}]: {a['text']}" for a in debate_history[-6:]])
     human_str = f"\nHuman observer added: {human_context}" if human_context else ""
 
+    from app.services.search_service import fetch_realtime_data
+    research_context = await fetch_realtime_data(topic, "con/oppose arguments risks")
+
     user_msg = f"""Topic: "{topic}"
 Round {round_num} — Your {round_types[round_num]}
+
+Real-time Search Context (Latest Studies & Data):
+{research_context}
 
 Debate history so far:
 {history_str}{human_str}
@@ -54,7 +60,7 @@ Generate your {round_types[round_num]} as the CON challenger. Return valid JSON 
         round=round_num,
         round_type=["opening", "rebuttal", "closing"][round_num - 1],
         text=data.get("text", ""),
-        score=min(100, max(0, int(data.get("score", 70)))),
+        score=min(1.0, max(0.0, float(data.get("score", 0.7)))),
         tone=data.get("tone", "neutral"),
         fallacies=[],
         timestamp=datetime.utcnow()

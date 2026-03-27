@@ -55,7 +55,7 @@ Analyze both arguments and return your evaluation as valid JSON only."""
         round=round_num,
         round_type=["opening", "rebuttal", "closing"][round_num - 1],
         text=data.get("text", ""),
-        score=min(100, max(0, int(data.get("score", 75)))),
+        score=min(1.0, max(0.0, float(data.get("score", 0.75)))),
         tone=data.get("tone", "neutral"),
         fallacies=[FallacyTag(**f) for f in data.get("fallacies", [])],
         timestamp=datetime.utcnow()
@@ -105,6 +105,6 @@ Deliver your final verdict as valid JSON only."""
         con_summary=data.get("con_summary", ""),
         consensus_conclusion=data.get("consensus_conclusion", ""),
         evidence_summary=data.get("evidence_summary", ""),
-        pro_total_score=min(100, max(0, int(data.get("pro_total_score", 70)))),
-        con_total_score=min(100, max(0, int(data.get("con_total_score", 70)))),
+        pro_total_score=min(3.0, max(0.0, float(data.get("pro_total_score", 2.1)))),
+        con_total_score=min(3.0, max(0.0, float(data.get("con_total_score", 2.1)))),
     )
