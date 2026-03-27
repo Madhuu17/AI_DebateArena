@@ -1,50 +1,27 @@
-import json
 import uuid
 from datetime import datetime
 from app.config import OPENAI_API_KEY, DEMO_MODE
 from app.agents.prompts import CON_SYSTEM_PROMPT
+from app.agents.topic_engine import get_debate_content
 from app.models.schemas import ArgumentResponse
-
-MOCK_CON_ARGS = {
-    1: {
-        "text": "The proposition ignores a fundamental truth: medicine is not data retrieval — it is human judgment under uncertainty. AI systems trained on historical datasets perpetuate systemic biases. Amazon scrapped their AI hiring tool because it discriminated against women. Medical AI trained predominantly on Western, affluent datasets will fail catastrophically for underrepresented populations, creating a two-tiered healthcare system worse than what we have today.",
-        "score": 79,
-        "tone": "aggressive"
-    },
-    2: {
-        "text": "The Pro side conveniently cites best-case scenarios while ignoring a critical 2021 Nature Medicine study showing AI diagnostic tools had 30% higher error rates on patients of color. Furthermore, who is liable when an AI kills a patient? Current legal frameworks have no answer. Replacing doctors with AI before solving accountability, bias, and liability is reckless experimentation on human lives.",
-        "score": 81,
-        "tone": "logical"
-    },
-    3: {
-        "text": "True healthcare requires trust — the kind built over years between a patient and their physician. Studies show patients are 70% less likely to follow treatment plans when they don't trust their provider. An AI cannot build that trust. The evidence consistently shows that while AI excels as a tool, it devastates as a replacement. The risks to human dignity, equity, and accountability are unjustifiable.",
-        "score": 83,
-        "tone": "emotional"
-    }
-}
-
-MOCK_CON_ARGS_GENERIC = {
-    "text": "This position overlooks significant risks and unintended consequences. Historical evidence demonstrates that such sweeping changes consistently harm vulnerable populations disproportionately. The ethical implications alone should give us serious pause before proceeding.",
-    "score": 73,
-    "tone": "logical"
-}
 
 
 async def run_con_agent(topic: str, round_num: int, debate_history: list, human_context: str = "") -> ArgumentResponse:
     if DEMO_MODE or not OPENAI_API_KEY:
-        mock = MOCK_CON_ARGS.get(round_num, MOCK_CON_ARGS_GENERIC)
+        content = get_debate_content(topic, round_num, "con")
         return ArgumentResponse(
             id=str(uuid.uuid4()),
             agent="con",
             round=round_num,
             round_type=["opening", "rebuttal", "closing"][round_num - 1],
-            text=mock["text"],
-            score=mock["score"],
-            tone=mock["tone"],
+            text=content["text"],
+            score=content["score"],
+            tone=content["tone"],
             fallacies=[],
             timestamp=datetime.utcnow()
         )
 
+    import json
     from openai import AsyncOpenAI
     client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 

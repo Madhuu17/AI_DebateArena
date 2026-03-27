@@ -1,51 +1,27 @@
-import json
 import uuid
 from datetime import datetime
 from app.config import OPENAI_API_KEY, DEMO_MODE
 from app.agents.prompts import PRO_SYSTEM_PROMPT
+from app.agents.topic_engine import get_debate_content
 from app.models.schemas import ArgumentResponse
-
-# Mock responses for DEMO_MODE
-MOCK_PRO_ARGS = {
-    1: {
-        "text": "Artificial intelligence has demonstrated remarkable capabilities in medical diagnosis, often matching or exceeding specialist accuracy. A landmark Stanford study showed AI detecting diabetic retinopathy with 90%+ accuracy — surpassing board-certified ophthalmologists. In a world where 57% of countries face critical physician shortages, AI doesn't just augment doctors; it democratizes access to expert-level care for billions who currently have none.",
-        "score": 82,
-        "tone": "confident"
-    },
-    2: {
-        "text": "The opposition raises concerns about AI errors, yet human doctors misdiagnose at a staggering 10-15% rate across specialties. AI systems like IBM Watson for Oncology have already shown they catch cases human oncologists miss. The question isn't whether AI is perfect — it's whether it's better than the alternative of no care at all for underserved populations.",
-        "score": 78,
-        "tone": "logical"
-    },
-    3: {
-        "text": "History shows that technology does not eliminate professions — it transforms them. Just as calculators made mathematicians more powerful, AI will elevate doctors to focus on what humans do best: empathy, complex ethical reasoning, and patient relationships. The evidence overwhelmingly supports AI integration as the defining medical advancement of our century.",
-        "score": 85,
-        "tone": "confident"
-    }
-}
-
-MOCK_PRO_ARGS_GENERIC = {
-    "text": "The evidence strongly supports this position. Multiple peer-reviewed studies demonstrate significant benefits, and leading experts in the field have reached strong consensus on this matter. The data clearly shows positive outcomes that cannot be ignored.",
-    "score": 75,
-    "tone": "confident"
-}
 
 
 async def run_pro_agent(topic: str, round_num: int, debate_history: list, human_context: str = "") -> ArgumentResponse:
     if DEMO_MODE or not OPENAI_API_KEY:
-        mock = MOCK_PRO_ARGS.get(round_num, MOCK_PRO_ARGS_GENERIC)
+        content = get_debate_content(topic, round_num, "pro")
         return ArgumentResponse(
             id=str(uuid.uuid4()),
             agent="pro",
             round=round_num,
             round_type=["opening", "rebuttal", "closing"][round_num - 1],
-            text=mock["text"],
-            score=mock["score"],
-            tone=mock["tone"],
+            text=content["text"],
+            score=content["score"],
+            tone=content["tone"],
             fallacies=[],
             timestamp=datetime.utcnow()
         )
 
+    import json
     from openai import AsyncOpenAI
     client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 

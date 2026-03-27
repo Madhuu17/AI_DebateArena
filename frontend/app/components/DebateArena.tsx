@@ -164,28 +164,36 @@ export default function DebateArena({ state, onHumanSubmit, onEvidenceAdd, onRes
             <div className="flex-1 overflow-y-auto px-8 py-8 space-y-12">
                <AnimatePresence mode="popLayout">
                  {activeTab === 'arena' && (
-                   <motion.div 
+                   <motion.div
+                    key="arena-feed"
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                     className="space-y-10"
                    >
                      {sortedArgs.map((arg, i) => (
-                       <div key={arg.id} className={`flex w-full ${arg.agent === 'con' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={arg.agent === 'judge' ? 'w-full px-12' : 'max-w-[85%]'}>
-                            <ChatBubble 
-                              {...arg} 
-                              roundLabel={arg.agent === 'judge' ? 'Arbiter Review' : `Round ${arg.round}`} 
+                       <div key={`${arg.id}`} className={`flex w-full ${arg.agent === 'con' ? 'justify-end' : 'justify-start'}`}>
+                          <div className={arg.agent === 'judge' ? 'w-full px-4' : 'max-w-[88%]'}>
+                            <ChatBubble
+                              {...arg}
+                              roundLabel={arg.agent === 'judge' ? 'Arbiter Review' : `Round ${arg.round} · ${arg.round_type?.toUpperCase() ?? ''}`}
                               index={i}
                             />
                           </div>
                        </div>
                      ))}
-                     {state.currentAgent && state.currentAgent !== 'human' && (
-                        <div className={`flex w-full ${state.currentAgent === 'con' ? 'justify-end' : 'justify-start'}`}>
-                           <ThinkingPlaceholder color={state.currentAgent === 'pro' ? '#3b82f6' : state.currentAgent === 'con' ? '#f43f5e' : '#f59e0b'} />
-                        </div>
-                     )}
+                     {/* Only show ThinkingPlaceholder when agent has no streaming arg yet */}
+                     {(() => {
+                       const streamingAgent = state.currentAgent;
+                       if (!streamingAgent || streamingAgent === 'human') return null;
+                       const alreadyStreaming = sortedArgs.some(a => a.agent === streamingAgent && a.isStreaming);
+                       if (alreadyStreaming) return null;
+                       return (
+                         <div key="thinking" className={`flex w-full ${streamingAgent === 'con' ? 'justify-end' : 'justify-start'}`}>
+                           <ThinkingPlaceholder color={streamingAgent === 'pro' ? '#3b82f6' : streamingAgent === 'con' ? '#f43f5e' : '#f59e0b'} />
+                         </div>
+                       );
+                     })()}
                      {state.verdict && (
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="pt-10">
+                        <motion.div key="verdict" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="pt-10">
                             <JudgeVerdict verdict={state.verdict} />
                         </motion.div>
                      )}

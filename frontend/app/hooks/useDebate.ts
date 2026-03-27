@@ -7,6 +7,22 @@ import {
 } from '../types';
 import { startDebate, createDebateStream, submitHumanInput } from '../lib/api';
 
+// Normalize snake_case API response to camelCase Argument type
+function normalizeArg(raw: any, streaming: boolean): Argument {
+  return {
+    id: raw.id,
+    agent: raw.agent,
+    round: raw.round,
+    roundType: raw.round_type ?? raw.roundType ?? 'opening',
+    text: raw.text ?? '',
+    score: raw.score ?? 0,
+    tone: raw.tone ?? 'neutral',
+    fallacies: raw.fallacies ?? [],
+    timestamp: raw.timestamp ?? new Date().toISOString(),
+    isStreaming: streaming,
+  };
+}
+
 const initialState: DebateState = {
   sessionId: null,
   topic: '',
@@ -51,8 +67,23 @@ export function useDebate() {
       const es = createDebateStream(session_id);
       eventSourceRef.current = es;
 
+      // Handle streaming (typewriter) events — upsert by ID
+      es.addEventListener('argument_stream', (e) => {
+        const raw = JSON.parse(e.data);
+        const arg = normalizeArg(raw, true);
+        setState(prev => ({
+          ...prev,
+          currentAgent: arg.agent,
+          arguments: prev.arguments.some(a => a.id === arg.id)
+            ? prev.arguments.map(a => a.id === arg.id ? arg : a)
+            : [...prev.arguments, arg],
+        }));
+      });
+
+      // Handle final argument — replace streaming one with full scored version
       es.addEventListener('argument', (e) => {
-        const arg: Argument = JSON.parse(e.data);
+        const raw = JSON.parse(e.data);
+        const arg = normalizeArg(raw, false);
         setState(prev => ({
           ...prev,
           currentAgent: arg.agent,
