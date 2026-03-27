@@ -45,7 +45,7 @@ export default function AgentCard({ agent, totalScore, isActive, roundsComplete 
 
   return (
     <motion.div
-      className="rounded-2xl p-5 relative overflow-hidden"
+      className="rounded-2xl p-6 relative overflow-hidden"
       style={{
         background: style.bg,
         border: `1px solid ${style.border}`,

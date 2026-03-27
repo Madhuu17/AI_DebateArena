@@ -55,7 +55,7 @@ export default function ChatBubble({
       initial={{ opacity: 0, y: 20, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.4, delay: index * 0.05, ease: 'easeOut' }}
-      className={clsx('rounded-xl p-4 glass', glowClass)}
+      className={clsx('rounded-xl p-5 glass', glowClass)}
       style={{ border: `1px solid ${borderColor}` }}
     >
       {/* Header */}

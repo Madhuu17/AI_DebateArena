@@ -50,8 +50,8 @@ export default function DebateArena({ state, onHumanSubmit, onEvidenceAdd, onRes
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-primary)] bg-grid">
       {/* Top Header */}
-      <header className="sticky top-0 z-50 glass border-b border-[rgba(255,255,255,0.07)] px-6 py-3">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-50 glass border-b border-[rgba(255,255,255,0.07)] px-8 py-4">
+        <div className="max-w-[1920px] mx-auto flex items-center justify-between gap-6">
           {/* Logo */}
           <div className="flex items-center gap-3 flex-shrink-0">
             <span className="text-xl">⚖️</span>
@@ -103,7 +103,7 @@ export default function DebateArena({ state, onHumanSubmit, onEvidenceAdd, onRes
       </div>
 
       {/* Main 4-column layout */}
-      <div className="flex-1 max-w-[1600px] mx-auto w-full px-4 py-6 grid grid-cols-1 lg:grid-cols-[1fr_1.2fr_1fr_300px] gap-4">
+      <div className="flex-1 max-w-[1920px] mx-auto w-full px-8 py-8 grid grid-cols-1 lg:grid-cols-[1fr_1.2fr_1fr_320px] gap-6 xl:gap-8">
 
         {/* === PRO COLUMN === */}
         <div className="flex flex-col gap-3">
