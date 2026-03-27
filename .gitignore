@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js build
+.next/
+out/
+build/
+
+# Env files  
+.env.local
+.env.*.local
+backend/.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+.pytest_cache/
+
+# ChromaDB data
+backend/chroma_data/
+
+# Misc
+.DS_Store
+*.log
+.idea/
+.vscode/
+*.suo
+*.user
