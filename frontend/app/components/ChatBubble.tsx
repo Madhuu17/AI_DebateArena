@@ -47,13 +47,16 @@ const THEME_COLORS: Record<string, { border: string; bg: string; icon: string; c
 
 const DEFAULT_THEME = THEME_COLORS.judge;
 
+const cursorTransition = { duration: 0.5, repeat: Infinity, ease: 'linear' as const };
+const cursorAnimate = { opacity: [1, 0] };
+
 export default function ChatBubble({
   agent, text, score, tone, fallacies = [], roundLabel, isStreaming = false, index = 0
 }: ChatBubbleProps) {
   const persona = AGENT_PERSONAS[agent];
   const toneTheme = TONE_THEMES[tone] ?? DEFAULT_TONE_THEME;
   const themeColors = THEME_COLORS[agent ?? 'judge'] ?? DEFAULT_THEME;
-  const safeFallacies = fallacies ?? [];
+  const safeFallacies = Array.isArray(fallacies) ? fallacies : [];
   const safeText = text ?? '';
 
   return (
@@ -111,8 +114,8 @@ export default function ChatBubble({
           {safeText}
           {isStreaming && (
             <motion.span
-              animate={{ opacity: [1, 0] }}
-              transition={{ duration: 0.5, repeat: Infinity, ease: 'linear' }}
+              animate={cursorAnimate}
+              transition={cursorTransition}
               className="ml-[3px] inline-block w-[3px] h-[1.1em] rounded-full align-middle"
               style={{ backgroundColor: themeColors.cursorColor, verticalAlign: 'text-bottom' }}
             />

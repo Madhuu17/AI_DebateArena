@@ -37,7 +37,7 @@ async def stream_debate(session_id: str):
         try:
             async for event in run_debate_graph(session_id, session["topic"]):
                 event_name = event["event"]
-                event_data = json.dumps(event["data"])
+                event_data = event["data"]
                 yield f"event: {event_name}\ndata: {event_data}\n\n"
                 await asyncio.sleep(0)
         except asyncio.CancelledError:

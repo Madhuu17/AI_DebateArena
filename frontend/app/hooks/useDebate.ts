@@ -10,7 +10,7 @@ import { startDebate, createDebateStream, submitHumanInput } from '../lib/api';
 // Normalize snake_case API response to camelCase Argument type
 function normalizeArg(raw: any, streaming: boolean): Argument {
   return {
-    id: raw.id,
+    id: raw.id || `temp-${raw.agent}-${raw.round ?? '0'}`,
     agent: raw.agent,
     round: raw.round,
     roundType: raw.round_type ?? raw.roundType ?? 'opening',
@@ -69,28 +69,36 @@ export function useDebate() {
 
       // Handle streaming (typewriter) events — upsert by ID
       es.addEventListener('argument_stream', (e) => {
-        const raw = JSON.parse(e.data);
-        const arg = normalizeArg(raw, true);
-        setState(prev => ({
-          ...prev,
-          currentAgent: arg.agent,
-          arguments: prev.arguments.some(a => a.id === arg.id)
-            ? prev.arguments.map(a => a.id === arg.id ? arg : a)
-            : [...prev.arguments, arg],
-        }));
+        try {
+          const raw = JSON.parse(e.data);
+          const arg = normalizeArg(raw, true);
+          setState(prev => ({
+            ...prev,
+            currentAgent: arg.agent,
+            arguments: prev.arguments.some(a => a.id === arg.id)
+              ? prev.arguments.map(a => a.id === arg.id ? arg : a)
+              : [...prev.arguments, arg],
+          }));
+        } catch (err) {
+          console.warn('Silent SSE parse error (stream chunk)', e.data);
+        }
       });
 
       // Handle final argument — replace streaming one with full scored version
       es.addEventListener('argument', (e) => {
-        const raw = JSON.parse(e.data);
-        const arg = normalizeArg(raw, false);
-        setState(prev => ({
-          ...prev,
-          currentAgent: arg.agent,
-          arguments: prev.arguments.some(a => a.id === arg.id)
-            ? prev.arguments.map(a => a.id === arg.id ? arg : a)
-            : [...prev.arguments, arg],
-        }));
+        try {
+          const raw = JSON.parse(e.data);
+          const arg = normalizeArg(raw, false);
+          setState(prev => ({
+            ...prev,
+            currentAgent: arg.agent,
+            arguments: prev.arguments.some(a => a.id === arg.id)
+              ? prev.arguments.map(a => a.id === arg.id ? arg : a)
+              : [...prev.arguments, arg],
+          }));
+        } catch (err) {
+          console.warn('Silent SSE parse error (final argument)', e.data);
+        }
       });
 
       es.addEventListener('round_change', (e) => {

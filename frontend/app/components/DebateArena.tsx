@@ -45,7 +45,7 @@ export default function DebateArena({ state, onHumanSubmit, onEvidenceAdd, onRes
   // Auto-scroll the feed
   useEffect(() => {
     feedEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [sortedArgs.length, state.humanInputs.length]);
+  }, [state.arguments, state.humanInputs.length]);
 
   const handleHumanSubmit = async () => {
     if (!humanStatement.trim()) return;
@@ -174,7 +174,7 @@ export default function DebateArena({ state, onHumanSubmit, onEvidenceAdd, onRes
                           <div className={arg.agent === 'judge' ? 'w-full px-4' : 'max-w-[88%]'}>
                             <ChatBubble
                               {...arg}
-                              roundLabel={arg.agent === 'judge' ? 'Arbiter Review' : `Round ${arg.round} · ${arg.round_type?.toUpperCase() ?? ''}`}
+                              roundLabel={arg.agent === 'judge' ? 'Arbiter Review' : `Round ${arg.round} · ${arg.roundType?.toUpperCase() ?? ''}`}
                               index={i}
                             />
                           </div>
