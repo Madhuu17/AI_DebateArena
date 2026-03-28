@@ -130,7 +130,7 @@ export default function ChatBubble({
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-text-muted">
                 <span>Argument Weight</span>
-                <span className="mono text-text-main">{score}/100</span>
+                <span className="mono text-text-main">{score.toFixed(1)} / 1.0</span>
               </div>
               <ScoreBar score={score} agentColor={agent === 'pro' ? 'blue' : agent === 'con' ? 'red' : 'amber'} />
             </div>

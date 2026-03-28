@@ -20,7 +20,7 @@ class ArgumentResponse(BaseModel):
     round_type: Literal["opening", "rebuttal", "closing"]
     text: str
     score: float = Field(ge=0.0, le=1.0)
-    tone: Literal["aggressive", "neutral", "confident", "emotional", "logical"]
+    tone: str
     fallacies: List[FallacyTag] = []
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 

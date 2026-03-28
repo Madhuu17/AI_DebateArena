@@ -25,8 +25,8 @@ def generate_scores(topic: str) -> Tuple[List[int], List[int]]:
     for r in range(1, 4):
         p_rng = _rand(topic, r, "pro")
         c_rng = _rand(topic, r, "con")
-        pro_scores.append(p_rng.randint(68, 92))
-        con_scores.append(c_rng.randint(68, 92))
+        pro_scores.append(p_rng.randint(68, 92) / 100.0)
+        con_scores.append(c_rng.randint(68, 92) / 100.0)
     return pro_scores, con_scores
 
 
@@ -190,7 +190,7 @@ def get_debate_content(topic: str, round_num: int, side: str, history_text: str 
 
     # Dynamic score: base seeded off topic + slight variation per round
     base_rng = _rand(topic, round_num * 7 + (1 if side == "pro" else 3), side)
-    score = base_rng.randint(70, 94)
+    score = base_rng.randint(70, 94) / 100.0
 
     # Judge fallacies
     fallacies = []
@@ -208,7 +208,7 @@ def get_debate_content(topic: str, round_num: int, side: str, history_text: str 
     return {"text": text, "score": score, "tone": tone, "fallacies": fallacies}
 
 
-def get_verdict(topic: str, pro_scores: List[int], con_scores: List[int]) -> Dict:
+def get_verdict(topic: str, pro_scores: List[float], con_scores: List[float]) -> Dict:
     """Return a fully topic-aware verdict based on actual scores."""
     rng = _rand(topic, 99, "verdict")
 
@@ -240,3 +240,27 @@ def get_verdict(topic: str, pro_scores: List[int], con_scores: List[int]) -> Dic
         "pro_total_score": pro_total,
         "con_total_score": con_total,
     }
+
+async def call_openrouter_llm(client, messages, response_format, temperature=0.8):
+    """Robust waterfall fallback for OpenRouter free models to survive weekend rate limits."""
+    models = [
+        "meta-llama/llama-3.1-8b-instruct:free",
+        "mistralai/mistral-nemo:free",
+        "qwen/qwen-2.5-7b-instruct:free",
+        "google/gemma-2-9b-it:free",
+        "huggingfaceh4/zephyr-7b-beta:free"
+    ]
+    for model in models:
+        try:
+            response = await client.chat.completions.create(
+                model=model,
+                messages=messages,
+                response_format=response_format,
+                temperature=temperature,
+            )
+            return response
+        except Exception as e:
+            if "429" in str(e) or "404" in str(e) or "Provider returned error" in str(e):
+                continue # Try the next free model
+            raise e
+    raise Exception("All 5 OpenRouter free models are currently rate-limited or offline. Please add a paid key ($1) or wait 5 minutes.")

@@ -54,9 +54,13 @@ export default function DebateArena({ state, onHumanSubmit, onEvidenceAdd, onRes
   };
 
   return (
-    <div className="min-h-screen flex flex-col mesh-bg selection:bg-pro-primary/30">
-      <div className="fixed inset-0 grad-pro opacity-30 pointer-events-none" />
-      <div className="fixed inset-0 grad-con opacity-30 pointer-events-none" />
+    <div className="min-h-screen flex flex-col bg-[#02040a] selection:bg-pro-primary/30 relative">
+      <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,#000_70%,transparent_100%)] opacity-20" />
+        <motion.div animate={{ x: [-50, 50, -50], y: [-20, 20, -20], scale: [1, 1.2, 1] }} transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }} className="absolute -top-[10%] -left-[10%] w-[800px] h-[800px] bg-blue-600/15 blur-[150px] rounded-full mix-blend-screen" />
+        <motion.div animate={{ x: [50, -50, 50], y: [20, -20, 20], scale: [1, 1.3, 1] }} transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 1 }} className="absolute -bottom-[10%] -right-[10%] w-[900px] h-[900px] bg-rose-600/15 blur-[160px] rounded-full mix-blend-screen" />
+        <motion.div animate={{ opacity: [0.1, 0.2, 0.1] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} className="absolute top-0 left-[30%] w-[600px] h-[300px] bg-amber-500/10 blur-[130px] rounded-full mix-blend-screen" />
+      </div>
 
       {/* 🏟️ NEW HIGH-FIDELITY HEADER (Scoreboard) */}
       <header className="sticky top-0 z-50 backdrop-blur-2xl border-b border-white/10 px-8 py-4">
@@ -120,7 +124,7 @@ export default function DebateArena({ state, onHumanSubmit, onEvidenceAdd, onRes
       </header>
 
       {/* 🎭 THE ARENA (Spacious Stage) */}
-      <main className="flex-1 max-w-[1800px] mx-auto w-full px-8 py-10">
+      <main className="flex-1 max-w-[1800px] mx-auto w-full px-8 py-10 relative z-10">
         <div className="grid grid-cols-12 gap-10 items-start h-[calc(100vh-180px)]">
           
           {/* ⬅️ PRO PROFILE WING (Stationary) */}

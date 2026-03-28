@@ -1,13 +1,13 @@
 import uuid
 from datetime import datetime
-from app.config import OPENAI_API_KEY, DEMO_MODE
+from app.config import OPENROUTER_API_KEY, DEMO_MODE
 from app.agents.prompts import CON_SYSTEM_PROMPT
 from app.agents.topic_engine import get_debate_content
 from app.models.schemas import ArgumentResponse
 
 
 async def run_con_agent(topic: str, round_num: int, debate_history: list, human_context: str = "") -> ArgumentResponse:
-    if DEMO_MODE or not OPENAI_API_KEY:
+    if DEMO_MODE or not OPENROUTER_API_KEY:
         content = get_debate_content(topic, round_num, "con")
         return ArgumentResponse(
             id=str(uuid.uuid4()),
@@ -23,7 +23,10 @@ async def run_con_agent(topic: str, round_num: int, debate_history: list, human_
 
     import json
     from openai import AsyncOpenAI
-    client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+    client = AsyncOpenAI(
+        api_key=OPENROUTER_API_KEY,
+        base_url="https://openrouter.ai/api/v1"
+    )
 
     round_types = {1: "opening statement", 2: "rebuttal", 3: "closing argument"}
     history_str = "\n".join([f"[{a['agent'].upper()}]: {a['text']}" for a in debate_history[-6:]])
@@ -43,8 +46,9 @@ Debate history so far:
 
 Generate your {round_types[round_num]} as the CON challenger. Return valid JSON only."""
 
-    response = await client.chat.completions.create(
-        model="gpt-4o",
+    from app.agents.topic_engine import call_openrouter_llm
+    response = await call_openrouter_llm(
+        client=client,
         messages=[
             {"role": "system", "content": CON_SYSTEM_PROMPT},
             {"role": "user", "content": user_msg}
@@ -54,6 +58,9 @@ Generate your {round_types[round_num]} as the CON challenger. Return valid JSON 
     )
 
     data = json.loads(response.choices[0].message.content)
+    if isinstance(data, list) and len(data) > 0:
+        data = data[0]
+        
     return ArgumentResponse(
         id=str(uuid.uuid4()),
         agent="con",

@@ -16,27 +16,27 @@ const AGENT_THEMES: Record<AgentType, {
 }> = {
   pro: { 
     primary: '#3b82f6', 
-    glow: 'rgba(59, 130, 246, 0.4)', 
+    glow: 'rgba(59, 130, 246, 0.8)', 
     icon: <Zap className="w-4 h-4" />, 
-    shadow: 'shadow-[0_0_40px_-5px_rgba(59, 130, 246, 0.2)]'
+    shadow: 'shadow-[0_0_60px_-10px_rgba(59,130,246,0.3)]'
   },
   con: { 
     primary: '#f43f5e', 
-    glow: 'rgba(244, 63, 94, 0.4)', 
+    glow: 'rgba(244, 63, 94, 0.8)', 
     icon: <Shield className="w-4 h-4" />, 
-    shadow: 'shadow-[0_0_40px_-5px_rgba(244, 63, 94, 0.2)]'
+    shadow: 'shadow-[0_0_60px_-10px_rgba(244,63,94,0.3)]'
   },
   judge: { 
     primary: '#f59e0b', 
-    glow: 'rgba(245, 158, 11, 0.4)', 
+    glow: 'rgba(245, 158, 11, 0.8)', 
     icon: <Activity className="w-4 h-4" />, 
-    shadow: 'shadow-[0_0_40px_-5px_rgba(245, 158, 11, 0.2)]'
+    shadow: 'shadow-[0_0_60px_-10px_rgba(245,158,11,0.3)]'
   },
   human: { 
     primary: '#a855f7', 
-    glow: 'rgba(168, 85, 247, 0.4)', 
+    glow: 'rgba(168, 85, 247, 0.8)', 
     icon: <Trophy className="w-4 h-4" />, 
-    shadow: 'shadow-[0_0_40px_-5px_rgba(168, 85, 247, 0.2)]'
+    shadow: 'shadow-[0_0_60px_-10px_rgba(168,85,247,0.3)]'
   },
 };
 

@@ -1,7 +1,7 @@
 import json
 import uuid
 from datetime import datetime
-from app.config import OPENAI_API_KEY, DEMO_MODE
+from app.config import OPENROUTER_API_KEY, DEMO_MODE
 from app.agents.prompts import JUDGE_SYSTEM_PROMPT, VERDICT_SYSTEM_PROMPT
 from app.agents.topic_engine import get_debate_content, get_verdict
 from app.models.schemas import ArgumentResponse, VerdictResponse, FallacyTag
@@ -13,7 +13,7 @@ async def run_judge_agent(
     pro_arg: ArgumentResponse,
     con_arg: ArgumentResponse,
 ) -> ArgumentResponse:
-    if DEMO_MODE or not OPENAI_API_KEY:
+    if DEMO_MODE or not OPENROUTER_API_KEY:
         content = get_debate_content(topic, round_num, "judge")
         fallacies = [FallacyTag(**f) for f in content["fallacies"]]
         return ArgumentResponse(
@@ -29,7 +29,10 @@ async def run_judge_agent(
         )
 
     from openai import AsyncOpenAI
-    client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+    client = AsyncOpenAI(
+        api_key=OPENROUTER_API_KEY,
+        base_url="https://openrouter.ai/api/v1"
+    )
 
     user_msg = f"""Topic: "{topic}" — Round {round_num} Analysis
 
@@ -38,8 +41,9 @@ CON argument: {con_arg.text}
 
 Analyze both arguments and return your evaluation as valid JSON only."""
 
-    response = await client.chat.completions.create(
-        model="gpt-4o",
+    from app.agents.topic_engine import call_openrouter_llm
+    response = await call_openrouter_llm(
+        client=client,
         messages=[
             {"role": "system", "content": JUDGE_SYSTEM_PROMPT},
             {"role": "user", "content": user_msg}
@@ -49,6 +53,9 @@ Analyze both arguments and return your evaluation as valid JSON only."""
     )
 
     data = json.loads(response.choices[0].message.content)
+    if isinstance(data, list) and len(data) > 0:
+        data = data[0]
+        
     return ArgumentResponse(
         id=str(uuid.uuid4()),
         agent="judge",
@@ -63,14 +70,17 @@ Analyze both arguments and return your evaluation as valid JSON only."""
 
 
 async def run_verdict(topic: str, all_arguments: list, evidence_summary: str = "") -> VerdictResponse:
-    if DEMO_MODE or not OPENAI_API_KEY:
+    if DEMO_MODE or not OPENROUTER_API_KEY:
         pro_scores = [a["score"] for a in all_arguments if a["agent"] == "pro"]
         con_scores = [a["score"] for a in all_arguments if a["agent"] == "con"]
         v = get_verdict(topic, pro_scores, con_scores)
         return VerdictResponse(**v)
 
     from openai import AsyncOpenAI
-    client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+    client = AsyncOpenAI(
+        api_key=OPENROUTER_API_KEY,
+        base_url="https://openrouter.ai/api/v1"
+    )
 
     transcript = "\n\n".join([
         f"[Round {a['round']} - {a['agent'].upper()}] (Score: {a['score']})\n{a['text']}"
@@ -86,8 +96,9 @@ Evidence submitted: {evidence_summary or 'No external evidence submitted.'}
 
 Deliver your final verdict as valid JSON only."""
 
-    response = await client.chat.completions.create(
-        model="gpt-4o",
+    from app.agents.topic_engine import call_openrouter_llm
+    response = await call_openrouter_llm(
+        client=client,
         messages=[
             {"role": "system", "content": VERDICT_SYSTEM_PROMPT},
             {"role": "user", "content": user_msg}
@@ -97,6 +108,9 @@ Deliver your final verdict as valid JSON only."""
     )
 
     data = json.loads(response.choices[0].message.content)
+    if isinstance(data, list) and len(data) > 0:
+        data = data[0]
+        
     return VerdictResponse(
         winner=data.get("winner", "neutral"),
         confidence=min(100, max(0, int(data.get("confidence", 50)))),
