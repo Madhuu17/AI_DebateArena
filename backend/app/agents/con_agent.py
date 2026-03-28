@@ -1,13 +1,13 @@
+import json
 import uuid
 from datetime import datetime
-from app.config import OPENROUTER_API_KEY, DEMO_MODE
+from app.config import UNIVERSAL_API_KEY, DEMO_MODE
 from app.agents.prompts import CON_SYSTEM_PROMPT
 from app.agents.topic_engine import get_debate_content
 from app.models.schemas import ArgumentResponse
 
-
 async def run_con_agent(topic: str, round_num: int, debate_history: list, human_context: str = "") -> ArgumentResponse:
-    if DEMO_MODE or not OPENROUTER_API_KEY:
+    if DEMO_MODE or not UNIVERSAL_API_KEY:
         content = get_debate_content(topic, round_num, "con")
         return ArgumentResponse(
             id=str(uuid.uuid4()),
@@ -22,18 +22,12 @@ async def run_con_agent(topic: str, round_num: int, debate_history: list, human_
         )
 
     import json
-    from openai import AsyncOpenAI
-    client = AsyncOpenAI(
-        api_key=OPENROUTER_API_KEY,
-        base_url="https://openrouter.ai/api/v1"
-    )
-
-    round_types = {1: "opening statement", 2: "rebuttal", 3: "closing argument"}
+    round_types = {1: "opening", 2: "rebuttal", 3: "closing"}
     history_str = "\n".join([f"[{a['agent'].upper()}]: {a['text']}" for a in debate_history[-6:]])
     human_str = f"\nHuman observer added: {human_context}" if human_context else ""
 
     from app.services.search_service import fetch_realtime_data
-    research_context = await fetch_realtime_data(topic, "con/oppose arguments risks")
+    research_context = await fetch_realtime_data(topic, "con/oppose/critique arguments facts")
 
     user_msg = f"""Topic: "{topic}"
 Round {round_num} — Your {round_types[round_num]}
@@ -46,9 +40,8 @@ Debate history so far:
 
 Generate your {round_types[round_num]} as the CON challenger. Return valid JSON only."""
 
-    from app.agents.topic_engine import call_openrouter_llm
-    response = await call_openrouter_llm(
-        client=client,
+    from app.agents.topic_engine import call_llm
+    response = await call_llm(
         messages=[
             {"role": "system", "content": CON_SYSTEM_PROMPT},
             {"role": "user", "content": user_msg}
@@ -60,15 +53,15 @@ Generate your {round_types[round_num]} as the CON challenger. Return valid JSON 
     data = json.loads(response.choices[0].message.content)
     if isinstance(data, list) and len(data) > 0:
         data = data[0]
-        
+
     return ArgumentResponse(
         id=str(uuid.uuid4()),
         agent="con",
         round=round_num,
-        round_type=["opening", "rebuttal", "closing"][round_num - 1],
-        text=data.get("text", ""),
-        score=min(1.0, max(0.0, float(data.get("score", 0.7)))),
-        tone=data.get("tone", "neutral"),
+        round_type=round_types[round_num],
+        text=data.get("argument", data.get("text", "No argument provided.")),
+        score=float(data.get("score", 0.8)),
+        tone=data.get("tone", "critical"),
         fallacies=[],
         timestamp=datetime.utcnow()
     )
