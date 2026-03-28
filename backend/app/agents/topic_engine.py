@@ -245,6 +245,16 @@ async def call_llm(messages, response_format, temperature=0.8):
     from app.config import UNIVERSAL_API_KEY
     from openai import AsyncOpenAI
     import json
+
+    class MockMessage:
+        def __init__(self, content):
+            self.content = content
+    class MockChoice:
+        def __init__(self, message):
+            self.message = message
+    class MockResponse:
+        def __init__(self, choices):
+            self.choices = choices
     
     if UNIVERSAL_API_KEY and UNIVERSAL_API_KEY.startswith("AIza"):
         client = AsyncOpenAI(api_key=UNIVERSAL_API_KEY, base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
@@ -276,21 +286,10 @@ async def call_llm(messages, response_format, temperature=0.8):
                 
         response_text = await asyncio.to_thread(fetch_ddg)
         
-        class MockMessage:
-            def __init__(self, content):
-                self.content = content
-        class MockChoice:
-            def __init__(self, message):
-                self.message = message
-        class MockResponse:
-            def __init__(self, choices):
-                self.choices = choices
-                
         return MockResponse([MockChoice(MockMessage(response_text))])
     except Exception as e:
         print(f"DEBUG: DDG Fallback failed ({str(e)}). Using Deterministic Engine.")
         # FINAL FALLBACK: Deterministic Topic Engine (Zero Latency, 100% Reliability)
-        from app.agents.topic_engine import get_debate_content
         # Extract context from messages
         topic_hint = "unknown"
         for m in messages:
@@ -299,28 +298,34 @@ async def call_llm(messages, response_format, temperature=0.8):
         
         # Determine side
         side = "pro"
-        if "CON" in str(messages) or "challenger" in str(messages):
+        is_verdict = "FINAL ARBITER" in str(messages) or "verdict" in str(messages).lower()
+        
+        if is_verdict:
+            side = "verdict"
+        elif "CON" in str(messages) or "challenger" in str(messages):
             side = "con"
         elif "JUDGE" in str(messages) or "evaluation" in str(messages):
             side = "judge"
             
-        content = get_debate_content(topic_hint, 1, side)
-        
-        # Format as a MockResponse
-        class MockMessage:
-            def __init__(self, content):
-                self.content = content
-        class MockChoice:
-            def __init__(self, message):
-                self.message = message
-        class MockResponse:
-            def __init__(self, choices):
-                self.choices = choices
-        
-        # Create JSON response matching expectations
-        if side == "judge":
-            mock_json = json.dumps({"analysis": content["text"], "score": content["score"], "tone": content["tone"], "fallacies": content["fallacies"]})
+        if side == "verdict":
+            # Use dummy scores as we can't easily parse history here
+            content = get_verdict(topic_hint, [0.8, 0.8, 0.8], [0.7, 0.7, 0.7])
+            mock_json = json.dumps({
+                "winner": content["winner"],
+                "confidence": content["confidence"],
+                "explanation": content["explanation"],
+                "pro_summary": content["pro_summary"],
+                "con_summary": content["con_summary"],
+                "consensus": content["consensus_conclusion"],
+                "evidence": content["evidence_summary"],
+                "pro_score": content["pro_total_score"],
+                "con_score": content["con_total_score"]
+            })
         else:
-            mock_json = json.dumps({"argument": content["text"], "score": content["score"], "tone": content["tone"]})
+            content = get_debate_content(topic_hint, 1, side)
+            if side == "judge":
+                mock_json = json.dumps({"analysis": content["text"], "score": content["score"], "tone": content["tone"], "fallacies": content["fallacies"]})
+            else:
+                mock_json = json.dumps({"argument": content["text"], "score": content["score"], "tone": content["tone"]})
             
         return MockResponse([MockChoice(MockMessage(mock_json))])
