@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 from app.config import UNIVERSAL_API_KEY, DEMO_MODE
 from app.agents.prompts import JUDGE_SYSTEM_PROMPT, VERDICT_SYSTEM_PROMPT
-from app.agents.topic_engine import get_debate_content, get_verdict
+from app.agents.topic_engine import get_debate_content, get_verdict, is_subjective_topic
 from app.models.schemas import ArgumentResponse, VerdictResponse, FallacyTag
 
 
@@ -102,10 +102,19 @@ Deliver your final verdict as valid JSON only."""
     if isinstance(data, list) and len(data) > 0:
         data = data[0]
 
+    # Final Guard: Force neutrality for subjective topics
+    winner = data.get("winner", "neutral") if data.get("winner") in ["pro", "con", "neutral"] else "neutral"
+    explanation = data.get("explanation", "")
+    
+    if is_subjective_topic(topic):
+        winner = "neutral"
+        if "subjective" not in explanation.lower():
+            explanation = f"[SYSTEM OVERRIDE: Subjective Topic] {explanation} (Note: As this is a subjective matter of preference or opinion, a neutral draw is mandated for the final verdict.)"
+
     return VerdictResponse(
-        winner=data.get("winner", "neutral") if data.get("winner") in ["pro", "con", "neutral"] else "neutral",
+        winner=winner,
         confidence=int(float(data.get("confidence", 0.5)) * 100) if float(data.get("confidence", 0.5)) <= 1.0 else int(data.get("confidence", 50)),
-        explanation=data.get("explanation", ""),
+        explanation=explanation,
         pro_summary=data.get("pro_summary", ""),
         con_summary=data.get("con_summary", ""),
         consensus_conclusion=data.get("consensus", ""),

@@ -208,6 +208,15 @@ def get_debate_content(topic: str, round_num: int, side: str, history_text: str 
     return {"text": text, "score": score, "tone": tone, "fallacies": fallacies}
 
 
+def is_subjective_topic(topic: str) -> bool:
+    """Detects if a topic is subjective (opinion/moral/preference) vs factual."""
+    subjective_words = ["better", "worse", "should", "ought", "right", "wrong", "moral", "ethical", "prefer", "best", "worst", "opinion", "feeling"]
+    topic_low = topic.lower()
+    # Simple keyword heuristic + length check (usually subjective topics are shorter or structured as comparisons)
+    if any(word in topic_low for word in subjective_words):
+        return True
+    return False
+
 def get_verdict(topic: str, pro_scores: List[float], con_scores: List[float]) -> Dict:
     """Return a fully topic-aware verdict based on actual scores."""
     rng = _rand(topic, 99, "verdict")
@@ -217,17 +226,19 @@ def get_verdict(topic: str, pro_scores: List[float], con_scores: List[float]) ->
     margin = abs(pro_total - con_total)
     confidence = min(95, 50 + margin * 2 + rng.randint(0, 8))
 
-    if pro_total > con_total:
+    is_subjective = is_subjective_topic(topic)
+
+    if is_subjective or pro_total == con_total:
+        winner = "neutral"
+        tmpl = rng.choice(VERDICT_TEMPLATES_CON_WIN) # Use CON win template base but override
+        tmpl = dict(tmpl)
+        tmpl["explanation"] = f"The topic '{topic}' is inherently subjective and revolves around personal, moral, or professional preferences rather than purely empirical facts. In such debates, there is no absolute 'winner.' Both sides presented distinct, valid perspectives that contribute to a nuanced understanding of the issue."
+    elif pro_total > con_total:
         winner = "pro"
         tmpl = rng.choice(VERDICT_TEMPLATES_PRO_WIN)
-    elif con_total > pro_total:
+    else:
         winner = "con"
         tmpl = rng.choice(VERDICT_TEMPLATES_CON_WIN)
-    else:
-        winner = "neutral"
-        tmpl = rng.choice(VERDICT_TEMPLATES_CON_WIN)
-        tmpl = dict(tmpl)
-        tmpl["explanation"] = f"The debate on '{topic}' ends in a draw. Both sides presented equally compelling arguments. PRO's evidence-based case for {topic} was matched by CON's robust accountability and equity critique."
 
     return {
         "winner": winner,
