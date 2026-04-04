@@ -1,4 +1,4 @@
-# 🏟️ AI Debate Arena — Hackathon Summary
+#  AI Debate Arena — Hackathon Summary
 
 ## What is it?
 
@@ -6,13 +6,13 @@ A **real-time, multi-agent AI debate system** where two autonomous AI agents (Ad
 
 ---
 
-## 🎯 The Big Idea (Elevator Pitch)
+##  The Big Idea (Elevator Pitch)
 
 > "We built a multi-agent AI system that can intelligently debate **any topic you give it** — in real-time, with streaming arguments, fallacy detection, live scoring, and an evidence-backed verdict with a detailed winner breakdown."
 
 ---
 
-## 🧱 Architecture Overview
+##  Architecture Overview
 
 ```
 User enters topic
@@ -40,7 +40,7 @@ User enters topic
 
 ---
 
-## 🛠️ Full Tech Stack
+## Full Tech Stack
 
 ### Frontend
 | Technology | Role |
@@ -109,22 +109,7 @@ User enters topic
 
 ---
 
-## 💡 What Makes It Impressive for Judges
-
-| Impressive Point | Why It Matters |
-|---|---|
-| **3 autonomous AI agents debating each other** | Shows multi-agent AI coordination, not just a single chatbot |
-| **Real-time word-by-word streaming** | Shows understanding of async streaming, SSE protocol, React state management |
-| **LangGraph orchestration** | Production-grade agentic framework used by top AI teams |
-| **Fallacy detection** | Goes beyond argument generation — evaluates argument quality |
-| **Dynamic scoring + verdict** | Results change meaningfully per topic (seeded), not hardcoded |
-| **Runs without API keys (DEMO_MODE)** | Impressive demo reliability — no live API dependency risk |
-| **Evidence fact-checking** | Grounded AI — integrates real-world search into debate |
-| **Full-stack** | Next.js + FastAPI + LangGraph + MongoDB + ChromaDB = production-ready |
-
----
-
-## 🗂️ Project Structure
+##  Project Structure
 
 ```
 BMSCE-Hackathon/
@@ -147,7 +132,7 @@ BMSCE-Hackathon/
     │   │   ├── pro_agent.py       # PRO Advocate agent
     │   │   ├── con_agent.py       # CON Challenger agent
     │   │   ├── judge_agent.py     # Judge + Verdict agents
-    │   │   ├── topic_engine.py    # 🆕 Dynamic topic-aware content generator
+    │   │   ├── topic_engine.py    # Dynamic topic-aware content generator
     │   │   └── prompts.py         # All system prompts
     │   ├── graph/
     │   │   └── debate_graph.py    # LangGraph SSE streaming orchestrator
@@ -161,7 +146,7 @@ BMSCE-Hackathon/
 
 ---
 
-## 🚀 Running the Project
+##  Running the Project
 
 ### Backend
 ```bash
@@ -180,22 +165,8 @@ npm install
 npm run dev
 ```
 
----
 
-## 🔑 Key Talking Points for Judges
-
-1. **"We use LangGraph to orchestrate 3 specialized agents in a directed graph"** — not just a single prompt
-2. **"Arguments stream word-by-word via SSE"** — real-time AI output, not batch responses
-3. **"The Judge detects logical fallacies in real-time"** — structured AI evaluation, not just generation
-4. **"DEMO_MODE uses a novel seeded topic engine"** — reliable demos without API cost/latency risk
-5. **"Evidence can be URL fact-checked via Tavily or image-analyzed via GPT-4o Vision"** — multimodal, grounded AI
-6. **"Scores and winner are computed dynamically from actual debate performance"** — not hardcoded
-7. **"Human-in-the-loop: observers can inject arguments mid-debate"** — human + AI collaboration
-8. **"Async FastAPI + Motor MongoDB + streaming SSE"** — production-grade backend architecture
-
----
-
-## 📈 Production Path (if you want to mention future scope)
+##  Production Path 
 
 - Connect real **OpenAI GPT-4o keys** → live, unrestricted debates
 - Add **user login** + debate history timeline
